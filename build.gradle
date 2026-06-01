@@ -20,6 +20,7 @@ repositories {
 ext {
 	set('springCloudVersion', "2025.1.1")
 	set('testcontainersBomVersion', "1.21.4")
+	set('keycloakVersion', "3.9.0")
 }
 
 dependencies {
@@ -38,11 +39,14 @@ dependencies {
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-webflux-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation "com.github.dasniko:testcontainers-keycloak:${keycloakVersion}"
 	testImplementation 'org.springframework.cloud:spring-cloud-stream-test-binder'
 	testImplementation 'org.springframework.boot:spring-boot-starter-data-r2dbc-test'
 	testImplementation 'org.testcontainers:junit-jupiter'
 	testImplementation 'org.testcontainers:postgresql'
 	testImplementation 'org.testcontainers:r2dbc'
+	testImplementation 'org.testcontainers:junit-jupiter'
 	testImplementation 'com.squareup.okhttp3:okhttp'
 	testImplementation 'com.squareup.okhttp3:mockwebserver'
 }

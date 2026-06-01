@@ -5,15 +5,23 @@ import com.polarbookshop.orderservice.order.domain.OrderService;
 import com.polarbookshop.orderservice.order.domain.OrderStatus;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.security.oauth2.server.resource.autoconfigure.reactive.ReactiveOAuth2ResourceServerAutoConfiguration;
 import org.springframework.boot.webflux.test.autoconfigure.WebFluxTest;
+import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
+import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockJwt;
 
-@WebFluxTest(OrderController.class)
+@WebFluxTest(
+        controllers = OrderController.class,
+        excludeAutoConfiguration = ReactiveOAuth2ResourceServerAutoConfiguration.class
+)
+@AutoConfigureWebTestClient
 class OrderControllerWebFluxTests {
 
     @Autowired
@@ -21,6 +29,9 @@ class OrderControllerWebFluxTests {
 
     @MockitoBean
     private OrderService orderService;
+
+    @MockitoBean
+    ReactiveJwtDecoder reactiveJwtDecoder;
 
     @Test
     void whenBookNotAvailableThenRejectOrder() {
@@ -30,6 +41,7 @@ class OrderControllerWebFluxTests {
                 .willReturn(Mono.just(expectedOrder));
 
         webClient
+                .mutateWith(mockJwt())
                 .post()
                 .uri("/orders")
                 .bodyValue(orderRequest)
